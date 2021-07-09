@@ -7,20 +7,21 @@ import ply_io
 if __name__ == '__main__':
 
     project = sys.argv[1]
-    name = os.path.split(project)[1]
+    name = project.split('.')[1]
     print ('processing project:', name)
-    
+
     df = pd.DataFrame()
 
     for asc in glob.glob(os.path.join(project, 'ascii', '*.ascii')):
-        
+
         scan_position = int(os.path.split(asc)[-1][7:10])
         print ('\tprocessing scan position:', scan_position)
 
         # read in scan
         tmp = pd.read_csv(asc, engine='c', dtype=float, error_bad_lines=False)
+        tmp.columns = ['PID[]','XYZ[0][m]','XYZ[1][m]','XYZ[2][m]','Deviation[]','Reflectance[dB]','Selected[]']
         column2column = {u'PID[]':'pid', u'Target Count[]':'tot_rtn', u'XYZ[0][m]':'x', u'XYZ[1][m]':'y', u'XYZ[2][m]':'z',
-                         u'Deviation[]':'dev', u'Reflectance[dB]':'refl', u'Target Index[]':'rtn_N', u'Selected[]':'sel'}
+                        u'Deviation[]':'dev', u'Reflectance[dB]':'refl', u'Target Index[]':'rtn_N', u'Selected[]':'sel'}
         tmp.columns = tmp.columns.map(column2column)
         tmp = tmp[tmp.sel == 1]
         if len(tmp) == 0:
